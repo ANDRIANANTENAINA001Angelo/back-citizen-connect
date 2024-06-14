@@ -1,0 +1,7 @@
+A gerer:
+	- Utilisateurs (citizen, image 4x4) (Qr fields)
+	- Services 
+	- Demande Service (payment, code reçu, fichier, status) 
+	- Fichiers (cin image) (ataché utilisateur)
+
+
