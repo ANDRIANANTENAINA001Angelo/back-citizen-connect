@@ -28,7 +28,7 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $service= new Service($request->data);
+        $service= new Service($request->all());
         $service->save();
         return response()->json(["message"=>"service saved","data"=>$service]);
     }

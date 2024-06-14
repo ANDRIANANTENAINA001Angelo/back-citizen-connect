@@ -22,8 +22,10 @@ return new class extends Migration
             $table->string('adresse');
             $table->string('cin')->unique()->nullable();
             $table->string('code_copie')->nullable();
-            $table->string('id_copie')->unique();
+            $table->string('id_copie')->unique()->nullable();
             $table->string('photo_path')->nullable();
+            $table->string('cin_front_path')->nullable();
+            $table->string('cin_back_path')->nullable();
             $table->string('face_info')->nullable();//for face reconization
             $table->string('password');
             

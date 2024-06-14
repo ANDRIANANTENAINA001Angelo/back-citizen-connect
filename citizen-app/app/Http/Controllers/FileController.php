@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
@@ -28,7 +29,11 @@ class FileController extends Controller
      */
     public function store(Request $request)
     {
-        $file= new File($request->data);
+        $data= $request->data;
+        $file_name= "/". $data["type"]."/". $data["nom"]. time().".pdf";
+        $data["path"]= Storage::put($file_name,$data["path"]);
+
+        $file= new File($data);
         $file->save();
         return response()->json(["message"=>"file saved","data"=>$file]);
     }
@@ -64,7 +69,11 @@ class FileController extends Controller
         $file= File::find($id);
         
         if($file){
-            $file->update($request->all());
+            $data= $request->data;
+            $file_name= "/". $data["type"]."/". $data["nom"]. time().".pdf";
+            $data["path"]= Storage::put($file_name,$data["path"]);
+
+            $file->update($data);
             $file->save();
             return response()->json(["message"=>"file updated","data"=>$file]);
         }

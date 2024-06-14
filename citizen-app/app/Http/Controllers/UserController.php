@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DicCodeCopie;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -28,9 +31,48 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $user= new User($request->data);
+        $data= $request->all();
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        // return response()->json($data);
+
+        if(isset($data["photo_path"])){
+            $file_name="/profile/img_".time().".png"; 
+            $data["photo_path"]= Storage::put($file_name,$request->data["photo_path"]);
+        }
+
+
+        if(isset($data["cin_front_path"])){
+            $file_name="/image/cin/front_".time().".png"; 
+            $data["cin_front_path"]= Storage::put($file_name,$request->data["photo_path"]);
+        }
+
+        if(isset($data["cin_back_path"])){
+            $file_name="/image/cin/back_".time().".png"; 
+            $data["cin_back_path"]= Storage::put($file_name,$request->data["photo_path"]);
+        }
+
+
+        if(isset($data["code_copie"])){
+            $data["id_copie"]= DicCodeCopie::generateIdCode($data["code_copie"],$data["lieu_naissance"]);
+        }
+
+        $user= new User($data);
         $user->save();
-        return response()->json(["message"=>"user saved","data"=>$user]);
+
+        $token= $user->createToken("token");
+        
+
+        $res=[
+            "token"=>$token->plainTextToken,
+            "id_user"=>$user->id,
+            "nom"=>$user->nom,
+            "prenom"=>$user->prenom,
+        ];
+        return response()->json(["message"=>"user saved","data"=>$res]);
     }
 
     /**
@@ -64,9 +106,29 @@ class UserController extends Controller
 
         @/** @var User $user description */        
         $user= User::find($id);
-        
+        $data= $request->all();
         if($user){
-            $user->update($request->all());
+
+            if (isset($data['password'])) {
+                $data['password'] = Hash::make($data['password']);
+            }
+
+            if(isset($data["photo_path"])){
+                $file_name="/profile/img_".time().".png"; 
+                $data["photo_path"]= Storage::put($file_name,$request->data["photo_path"]);
+            }
+
+            if(isset($data["cin_front_path"])){
+                $file_name="/image/cin/front_".time().".png"; 
+                $data["cin_front_path"]= Storage::put($file_name,$request->data["photo_path"]);
+            }
+            
+            if(isset($data["cin_back_path"])){
+                $file_name="/image/cin/back_".time().".png"; 
+                $data["cin_back_path"]= Storage::put($file_name,$request->data["photo_path"]);
+            }
+
+            $user->update($data);
             $user->save();
             return response()->json(["message"=>"user updated","data"=>$user]);
         }

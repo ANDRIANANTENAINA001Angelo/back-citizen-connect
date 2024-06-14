@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\DemandeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DemandeServiceController extends Controller
 {
@@ -28,7 +30,29 @@ class DemandeServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $demande= new DemandeService($request->data);
+
+        $user= Auth::user();
+        $data= $request->data;
+        
+        $data["user_id"]= $user->id;
+        $last= DemandeService::all()->last()->get();
+
+        if($last->isNoEmpty){
+            $data["code"]= $last->id +1;
+        }
+        else{
+            $data["code"]= $last->id;
+        }
+
+
+        if(isset($data["code_path"])){
+            $file_name= "/demande/code_". $data["code_recu"].".pdf";
+            $data["code_path"]= Storage::put($file_name,$data["path"]);
+        }
+
+
+
+        $demande= new DemandeService($data);
         $demande->save();
         return response()->json(["message"=>"demande saved","data"=>$demande]);
     }
@@ -38,7 +62,7 @@ class DemandeServiceController extends Controller
      */
     public function show(string $id)
     {
-        $demande= DemandeService::find($id);
+        $demande= DemandeService::with("user")->find($id)->get();
         
         if($demande){
             return response()->json(["data"=>$demande]);
@@ -61,10 +85,19 @@ class DemandeServiceController extends Controller
      */
     public function update(Request $request, string $id)
     {
+
+        
         $demande= DemandeService::find($id);
         
         if($demande){
-            $demande->update($request->all());
+            $data= $request->data;
+
+            if(isset($data["code_path"])){
+                $file_name= "/demande/code_". $data["code_recu"].".pdf";
+                $data["code_path"]= Storage::put($file_name,$data["path"]);
+            }
+
+            $demande->update($data);
             $demande->save();
             return response()->json(["message"=>"demande updated","data"=>$demande]);
         }
@@ -89,3 +122,4 @@ class DemandeServiceController extends Controller
         }
     }
 }
+

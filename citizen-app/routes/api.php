@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
@@ -27,4 +28,6 @@ Route::resource("services",ServiceController::class)->except(["edit","create"]);
 Route::resource("files",FileController::class)->except(["edit","create"]);
 Route::resource("demandeServices",DemandeService::class)->except(["edit","create"]);
 
+Route::post("login",[AuthController::class,"Login"]);
+Route::post("logout",[AuthController::class,"Logout"])->middleware("auth:sanctum");
 
