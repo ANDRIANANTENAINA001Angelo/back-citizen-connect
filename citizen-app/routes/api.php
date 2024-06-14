@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\UserController;
+use App\Models\DemandeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +18,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::resource("users",UserController::class)->except(["edit","create"]);
+Route::resource("services",ServiceController::class)->except(["edit","create"]);
+Route::resource("files",FileController::class)->except(["edit","create"]);
+Route::resource("demandeServices",DemandeService::class)->except(["edit","create"]);
+
+
