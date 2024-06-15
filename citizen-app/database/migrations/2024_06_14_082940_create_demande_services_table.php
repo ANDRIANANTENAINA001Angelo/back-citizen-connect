@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('demande_services', function (Blueprint $table) {
             $table->id();
             $table->string("code_recu");
-            $table->string("code_path");
+            $table->string("code_path")->nullable();
             $table->string("file_path")->nullable();
             $table->string("mode_payment")->nullable();
 

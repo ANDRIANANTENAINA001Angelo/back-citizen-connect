@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DemandeService;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -31,18 +32,27 @@ class DemandeServiceController extends Controller
     public function store(Request $request)
     {
 
+        $data= $request->all();
+
         $user= Auth::user();
-        $data= $request->data;
+        $service= Service::find($data["service_id"]);
         
         $data["user_id"]= $user->id;
-        $last= DemandeService::all()->last()->get();
+        $last= DemandeService::latest()->first();
 
-        if($last->isNoEmpty){
-            $data["code"]= $last->id +1;
+
+        if ($last) {
+            $data["code_recu"] = $last->id + 1;
+        } else {
+            $data["code_recu"] = 1; // Cas où il n'y a pas encore d'enregistrements dans la table
         }
-        else{
-            $data["code"]= $last->id;
-        }
+
+        // if($last->isNoEmpty){
+        //     $data["code"]= $last->id +1;
+        // }
+        // else{
+        //     $data["code"]= $last->id;
+        // }
 
 
         if($request->hasFile("code_path")){
@@ -55,7 +65,12 @@ class DemandeServiceController extends Controller
 
         $demande= new DemandeService($data);
         $demande->save();
-        return response()->json(["message"=>"demande saved","data"=>$demande]);
+
+        $res= [
+            "service"=>$service,
+            "demande"=>$demande
+        ];
+        return response()->json(["message"=>"demande saved","data"=>$res]);
     }
 
     /**
