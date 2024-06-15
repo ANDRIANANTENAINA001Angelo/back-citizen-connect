@@ -129,36 +129,48 @@ class AuthController extends Controller
             return response()->json(["error" => "User not found"], 404);
         }
 
-        $filepath= "/login/". $user->id. "_" . time()."jpg";
-        $user_image_url = Storage::put($filepath, $data["image"]); 
 
-        // URL de l'image à tester (fournie par la requête)
-        $image_url_test = $user->photo_path;
-
-        $client = new Client();
-        $response = $client->post('http://localhost:5000/correspondance', [
-            'json' => [
-                'image_url_test' => $image_url_test,
-                'image_url_compare' => $user_image_url
-            ]
-        ]);
-
-        $body = json_decode($response->getBody(), true);
-
-        if ($body['correspondance'] == 1) {
-            $token = $user->createToken("token")->plainTextToken;
-
-            $res = [
-                "token" => $token,
-                "id_user" => $user->id,
-                "nom" => $user->nom,
-                "prenom" => $user->prenom,
-            ];
-
-            return response()->json(["message" => "User connected", "data" => $res]);
-        } else {
-            return response()->json(["error" => "User not recognized"], 401);
+        // Traitement du fichier s'il est présent
+        if ($request->hasFile('capture')) {
+            $file = $request->file('capture');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('capture', $fileName, 'public');
+            
+            $user_image_url = $filePath; 
+            
+            $image_url_test = $user->photo_path;
+            
+            $client = new Client();
+            $response = $client->post('http://localhost:5000/correspondance', [
+                'json' => [
+                    'image_url' => "http://localhost:8000/storage/".$image_url_test,
+                    'profile_url' => "http://localhost:8000/storage/".$user_image_url
+                ]
+            ]);
+    
+            $body = json_decode($response->getBody(), true);
+    
+            if ($body['correspondance'] == 1) {
+                $token = $user->createToken("token")->plainTextToken;
+    
+                $res = [
+                    "token" => $token,
+                    "id_user" => $user->id,
+                    "nom" => $user->nom,
+                    "prenom" => $user->prenom,
+                ];
+    
+                return response()->json(["message" => "User connected", "data" => $res]);
+            } else {
+                return response()->json(["error" => "User not recognized"], 400);
+            }
         }
+        else{
+            return response()->json(["error" => "User not recognized"], 400);
+        }
+
+
+
     }
 
 

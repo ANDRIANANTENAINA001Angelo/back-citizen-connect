@@ -45,9 +45,10 @@ class DemandeServiceController extends Controller
         }
 
 
-        if(isset($data["code_path"])){
+        if($request->hasFile("code_path")){
+            $file= $request->file("code_path");
             $file_name= "/demande/code_". $data["code_recu"].".pdf";
-            $data["code_path"]= Storage::put($file_name,$data["path"]);
+            $data["code_path"]= Storage::put($file_name,$file);
         }
 
 
@@ -92,9 +93,10 @@ class DemandeServiceController extends Controller
         if($demande){
             $data= $request->data;
 
-            if(isset($data["code_path"])){
+            if($request->hasFile("code_path")){
+                $file= $request->file("code_path");
                 $file_name= "/demande/code_". $data["code_recu"].".pdf";
-                $data["code_path"]= Storage::put($file_name,$data["path"]);
+                $data["code_path"]= Storage::put($file_name,$file);
             }
 
             $demande->update($data);

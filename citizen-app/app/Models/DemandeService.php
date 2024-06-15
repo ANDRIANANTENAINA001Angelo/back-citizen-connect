@@ -13,6 +13,7 @@ class DemandeService extends Model
     protected $fillable= [
         "code_recu",
         "code_path",
+        "file_path",
         "mode_payment",
         "service_id", // à vérifier
         "user_id" // à vérifier

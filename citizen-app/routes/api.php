@@ -26,8 +26,12 @@ use Illuminate\Support\Facades\Route;
 Route::resource("users",UserController::class)->except(["edit","create"]);
 Route::resource("services",ServiceController::class)->except(["edit","create"]);
 Route::resource("files",FileController::class)->except(["edit","create"]);
-Route::resource("demandeServices",DemandeService::class)->except(["edit","create"]);
+Route::resource("demandeServices",DemandeService::class)->except(["edit","create"])->middleware("auth:sanctum");
 
 Route::post("login",[AuthController::class,"Login"]);
+Route::post("loginCam",[AuthController::class,"LoginImage"]);
 Route::post("logout",[AuthController::class,"Logout"])->middleware("auth:sanctum");
 
+
+Route::post('uploads/{id}',[UserController::class,"uploads"]);
+Route::post('uploads-cin/{id}',[UserController::class,"uploads_cin"]);

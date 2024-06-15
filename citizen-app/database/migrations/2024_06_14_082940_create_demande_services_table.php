@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string("code_recu");
             $table->string("code_path");
+            $table->string("file_path")->nullable();
             $table->string("mode_payment")->nullable();
 
             $table->foreignIdFor(Service::class);
